@@ -11,25 +11,29 @@
 	<v:menu />
 	<h1>Docent zoeken</h1>
 	<form>
-		<label>
-			Nummer:<span>${fouten.id}</span>
-			<input name='id' value='${param.id}' required autofocus type='number' min='1'> 
-		</label>
-		<input type='submit' value='Zoeken'>
+		<label> Nummer:<span>${fouten.id}</span> <input name='id'
+			value='${param.id}' required autofocus type='number' min='1'>
+		</label> <input type='submit' value='Zoeken'>
 	</form>
 	<c:if test="${not empty param and empty fouten and empty docent}">
 		Docent niet gevonden
 	</c:if>
 	<c:if test="${not empty docent}">
-		${docent.naam}, wedde: &euro; <fmt:formatNumber value='${docent.wedde}'/>
+		${docent.naam}, wedde: &euro; <fmt:formatNumber
+			value='${docent.wedde}' />
 		${docent.geslacht == 'MAN' ? '&#x2642;' : '&#x2640;'}
 		<h2>Acties</h2>
 		<c:url value="/docenten/verwijderen.htm" var="verwijderURL">
-			<c:param name="id" value="${docent.id}"/>
+			<c:param name="id" value="${docent.id}" />
 		</c:url>
 		<form action="${verwijderURL}" method="post">
 			<input type="submit" value="Verwijderen">
 		</form>
+		<c:url value='/docenten/opslag.htm' var='opslagURL'>
+			<c:param name='id' value='${docent.id}' />
+		</c:url>
+		<a href='${opslagURL}' class='knop'><input type="button"
+			value='Opslag'></a>
 	</c:if>
 </body>
 </html>
