@@ -27,8 +27,7 @@ public class Docent implements Serializable {
 	private long rijksRegisterNr;
 	@Enumerated(EnumType.STRING)
 	private Geslacht geslacht;
-	
-	
+		
 	public Docent(String voornaam, String familienaam, BigDecimal wedde, long rijksRegisterNr, Geslacht geslacht) {
 		setVoornaam(voornaam);
 		setFamilienaam(familienaam);
