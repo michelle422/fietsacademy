@@ -20,7 +20,8 @@ public class ZoekenServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String VIEW = "/WEB-INF/JSP/docenten/zoeken.jsp";
 	private final transient DocentService docentService
-	= new DocentService();
+			= new DocentService();
+	private static final String REDIRECT_URL = "%s/docenten/zoeken.htm?id=%d";
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,8 +46,30 @@ public class ZoekenServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		long id = Long.parseLong(request.getParameter("id"));
+		if (request.getParameter("verwijderen") == null) {
+			bijnamenToevoegen(request, response, id);
+		} else {
+			bijnamenVerwijderen(request, response, id);
+		}
 	}
-
+	private void bijnamenVerwijderen(HttpServletRequest request, HttpServletResponse response, long id) 
+		throws ServletException, IOException {
+		String[] bijnamen = request.getParameterValues("bijnaam");
+		if (bijnamen != null) {
+			docentService.bijnamenVerwijderen(id, bijnamen);
+		}
+		response.sendRedirect(response.encodeRedirectURL(String.format(REDIRECT_URL, request.getContextPath(), id)));
+	}
+	private void bijnamenToevoegen(HttpServletRequest request, HttpServletResponse response, long id) 
+			throws ServletException, IOException {
+		String bijnaam = request.getParameter("bijnaam");
+		if (bijnaam == null || bijnaam.trim().isEmpty()) {
+			request.setAttribute("fouten", Collections.singletonMap("bijnaam", "verplicht"));
+			request.getRequestDispatcher(VIEW).forward(request, response);
+		} else {
+			docentService.bijnaamToevoegen(id, bijnaam);
+			response.sendRedirect(response.encodeRedirectURL(String.format(REDIRECT_URL, request.getContextPath(), id)));
+		}
+	}
 }

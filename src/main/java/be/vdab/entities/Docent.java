@@ -3,13 +3,22 @@ package be.vdab.entities;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import be.vdab.enums.Geslacht;
@@ -27,13 +36,22 @@ public class Docent implements Serializable {
 	private long rijksRegisterNr;
 	@Enumerated(EnumType.STRING)
 	private Geslacht geslacht;
-		
-	public Docent(String voornaam, String familienaam, BigDecimal wedde, long rijksRegisterNr, Geslacht geslacht) {
+	@ElementCollection
+	@CollectionTable(name = "docentenbijnamen", joinColumns = @JoinColumn(name = "docentid"))
+	@Column(name = "Bijnaam")
+	private Set<String> bijnamen;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "campusid")
+	private Campus campus;
+	
+	public Docent(String voornaam, String familienaam, BigDecimal wedde, long rijksRegisterNr, 
+			Geslacht geslacht) {
 		setVoornaam(voornaam);
 		setFamilienaam(familienaam);
 		setWedde(wedde);
 		setRijksRegisterNr(rijksRegisterNr);
 		setGeslacht(geslacht);
+		bijnamen = new HashSet<>();
 	}
 
 	protected Docent() {
@@ -60,6 +78,18 @@ public class Docent implements Serializable {
 	
 	public Geslacht getGeslacht() {
 		return geslacht;
+	}
+
+	public Set<String> getBijnamen() {
+		return Collections.unmodifiableSet(bijnamen);
+	}
+
+	public Campus getCampus() {
+		return campus;
+	}
+
+	public void setCampus(Campus campus) {
+		this.campus = campus;
 	}
 
 	public static boolean isVoornaamValid(String voornaam) {
@@ -118,4 +148,27 @@ public class Docent implements Serializable {
 		BigDecimal factor = BigDecimal.ONE.add(percentage.divide(BigDecimal.valueOf(100)));
 		wedde = wedde.multiply(factor).setScale(2, RoundingMode.HALF_UP);
 	}
+	
+	public void addBijnaam(String bijnaam) {
+		bijnamen.add(bijnaam);
+	}
+	
+	public void removeBijnaam(String bijnaam) {
+		bijnamen.remove(bijnaam);
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.valueOf(rijksRegisterNr).hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Docent)) {
+			return false;
+		}
+		return rijksRegisterNr == ((Docent)obj).rijksRegisterNr;
+	}
+	
+	
 }
