@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.persistence.PersistenceException;
 
 import be.vdab.entities.Docent;
+import be.vdab.exceptions.DocentBestaatAlException;
 import be.vdab.repositories.DocentRepository;
 import be.vdab.valueObjects.AantalDocentenPerWedde;
 import be.vdab.valueObjects.VoornaamEnId;
@@ -18,6 +19,9 @@ public class DocentService extends AbstractService {
 		return docentRepository.read(id);
 	}
 	public void create(Docent docent) {
+		if (docentRepository.findByRijksRegisterNr(docent.getRijksRegisterNr()).isPresent()) {
+			throw new DocentBestaatAlException();
+		}
 		beginTransaction();
 		try {
 			docentRepository.create(docent);

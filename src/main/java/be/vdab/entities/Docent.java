@@ -89,7 +89,13 @@ public class Docent implements Serializable {
 	}
 
 	public void setCampus(Campus campus) {
+		if (this.campus != null && this.campus.getDocenten().contains(this)) {
+			this.campus.remove(this);
+		}
 		this.campus = campus;
+		if (this.campus != null && !this.campus.getDocenten().contains(this)) {
+			this.campus.add(this);
+		}
 	}
 
 	public static boolean isVoornaamValid(String voornaam) {
