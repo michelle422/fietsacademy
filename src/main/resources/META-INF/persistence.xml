@@ -13,6 +13,7 @@
  		<class>be.vdab.entities.IndividueleCursus</class>
  		<class>be.vdab.entities.Campus</class>
  		<class>be.vdab.entities.Verantwoordelijkheid</class>
+ 		<class>be.vdab.entities.Manager</class>
  		<class>be.vdab.valueObjects.Adres</class>
  		<class>be.vdab.valueObjects.TelefoonNr</class>
 		<properties>
