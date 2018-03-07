@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import be.vdab.services.CampusService;
+import be.vdab.services.DocentService;
 
 /**
  * Servlet implementation class CampusDocentenServlet
@@ -17,6 +18,7 @@ public class CampusDocentenServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String VIEW = "/WEB-INF/JSP/campussen/docenten.jsp";
 	private final transient CampusService campusService = new CampusService();
+	private final transient DocentService docentService = new DocentService();
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -27,6 +29,9 @@ public class CampusDocentenServlet extends HttpServlet {
 		if (id != null) {
 			campusService.read(Long.parseLong(id))
 				.ifPresent(campus -> request.setAttribute("campus", campus));
+			if (request.getParameter("bestbetaalde") != null) {
+				request.setAttribute("docenten", docentService.findBestBetaaldVanEenCampus(Long.parseLong(id)));
+			}
 		}
 		request.getRequestDispatcher(VIEW).forward(request, response);
 	}

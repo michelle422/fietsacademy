@@ -2,19 +2,26 @@ package be.vdab.services;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import javax.persistence.RollbackException;
 
+import be.vdab.entities.Campus;
 import be.vdab.entities.Docent;
 import be.vdab.exceptions.DocentBestaatAlException;
+import be.vdab.exceptions.RecordAangepastException;
+import be.vdab.repositories.CampusRepository;
 import be.vdab.repositories.DocentRepository;
 import be.vdab.valueObjects.AantalDocentenPerWedde;
 import be.vdab.valueObjects.VoornaamEnId;
 
 public class DocentService extends AbstractService {
 	private final DocentRepository docentRepository = new DocentRepository();
+	private final CampusRepository campusRepository = new CampusRepository();
 	public Optional<Docent> read(long id) {
 		return docentRepository.read(id);
 	}
@@ -45,7 +52,12 @@ public class DocentService extends AbstractService {
 		beginTransaction();
 		try {
 			docentRepository.read(id).ifPresent(docent -> docent.opslag(percentage));
+//			docentRepository.readWithLock(id).ifPresent(docent -> docent.opslag(percentage));
 			commit();
+		}catch (RollbackException ex) {
+			if (ex.getCause() instanceof OptimisticLockException) {
+				throw new RecordAangepastException();
+			}
 		} catch (PersistenceException ex) {
 			rollback();
 			throw ex;
@@ -95,5 +107,12 @@ public class DocentService extends AbstractService {
 			rollback();
 			throw ex;
 		}
+	}
+	public List<Docent> findBestBetaaldVanEenCampus(long id) {
+		Optional<Campus> optionalCampus = campusRepository.read(id);
+		if (optionalCampus.isPresent()) {
+			return docentRepository.findBestBetaaldVanEenCampus(optionalCampus.get());
+		}
+		return Collections.emptyList();
 	}
 }

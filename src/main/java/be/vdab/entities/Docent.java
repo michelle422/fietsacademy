@@ -21,14 +21,33 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import be.vdab.enums.Geslacht;
 
 @Entity
 @Table(name="docenten")
+@NamedEntityGraphs({
+	@NamedEntityGraph(name = Docent.MET_CAMPUS, attributeNodes = @NamedAttributeNode("campus")),
+	@NamedEntityGraph(name = Docent.MET_CAMPUS_EN_VERANTWOORDELIJKHEDEN, 
+						attributeNodes = {@NamedAttributeNode("campus"), 
+										@NamedAttributeNode("verantwoordelijkheden")}), 
+	@NamedEntityGraph(name = Docent.MET_CAMPUS_EN_MANAGER, 
+						attributeNodes = @NamedAttributeNode(value = "campus", subgraph = "metManager"), 
+							subgraphs = @NamedSubgraph(name = "metManager", 
+											attributeNodes = @NamedAttributeNode("manager")))
+})
 public class Docent implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final String MET_CAMPUS = "Docent.metCampus";
+	public static final String MET_CAMPUS_EN_VERANTWOORDELIJKHEDEN = 
+			"Docent.metCampusEnVerantwoordelijkheden";
+	public static final String MET_CAMPUS_EN_MANAGER = "Docent.metCampusEnManager";
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
@@ -47,6 +66,8 @@ public class Docent implements Serializable {
 	private Campus campus;
 	@ManyToMany(mappedBy = "docenten")
 	private Set<Verantwoordelijkheid> verantwoordelijkheden;
+	@Version
+	private long versie;
 	
 	public Docent(String voornaam, String familienaam, BigDecimal wedde, long rijksRegisterNr, 
 			Geslacht geslacht) {

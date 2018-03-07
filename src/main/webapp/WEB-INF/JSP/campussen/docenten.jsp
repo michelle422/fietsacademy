@@ -21,8 +21,13 @@
 	</ul>
 	<c:if test="${not empty campussen}">
 		<h2>${campus.naam} ${campus.adres.gemeente}</h2>
+		<c:url value='' var="bestBetaaldeURL">
+			<c:param name="id" value="${campus.id}"/>
+			<c:param name="bestbetaalde" value='true'/>
+		</c:url>
+		<a href='${bestBetaaldeURL}'>Best betaalde</a>
 		<dl>
-			<c:forEach items="${campus.docenten}" var="docent">
+			<c:forEach items="${empty param.bestbetaalde ? campus.docenten : docenten}" var="docent">
 				<dt>${docent.naam}</dt>
 				<dd>&euro; <fmt:formatNumber value="${docent.wedde}" minFractionDigits="2" 
 					maxFractionDigits="2"/></dd>

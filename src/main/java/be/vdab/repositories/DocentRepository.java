@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 
+import be.vdab.entities.Campus;
 import be.vdab.entities.Docent;
 import be.vdab.valueObjects.AantalDocentenPerWedde;
 import be.vdab.valueObjects.VoornaamEnId;
@@ -27,6 +29,7 @@ public class DocentRepository extends AbstractRepository {
 				.setParameter("tot", tot)
 				.setFirstResult(vanafRij)
 				.setMaxResults(aantalRijen)
+				.setHint("javax.persistence.loadgraph", getEntityManager().createEntityGraph(Docent.MET_CAMPUS))
 				.getResultList();
 	}
 	public List<VoornaamEnId> findVoornamen() {
@@ -59,5 +62,14 @@ public class DocentRepository extends AbstractRepository {
 		} catch (NoResultException ex) {
 			return Optional.empty();
 		}
+	}
+	public List<Docent> findBestBetaaldVanEenCampus(Campus campus) {
+		return getEntityManager()
+				.createNamedQuery("Docent.findBestBetaaldeVanEenCampus", Docent.class)
+				.setParameter("campus", campus)
+				.getResultList();
+	}
+	public Optional<Docent> readWithLock(long id) {
+		return Optional.ofNullable(getEntityManager().find(Docent.class, id, LockModeType.PESSIMISTIC_WRITE));
 	}
 }

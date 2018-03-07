@@ -37,7 +37,6 @@ public class Campus implements Serializable {
 	@OrderBy("fax")
 	private Set<TelefoonNr> telefoonNrs;
 	@OneToMany(mappedBy = "campus")
-//	@JoinColumn(name = "campusid")
 	@OrderBy("voornaam, familienaam")
 	private Set<Docent> docenten;
 	@OneToOne(fetch = FetchType.LAZY)
