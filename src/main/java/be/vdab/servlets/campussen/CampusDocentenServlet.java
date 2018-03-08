@@ -26,7 +26,7 @@ public class CampusDocentenServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setAttribute("campussen", campusService.findAll());
 		String id = request.getParameter("id");
-		if (id != null) {
+		if (id != null && !id.isEmpty()) {
 			campusService.read(Long.parseLong(id))
 				.ifPresent(campus -> request.setAttribute("campus", campus));
 			if (request.getParameter("bestbetaalde") != null) {
